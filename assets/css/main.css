@@ -2036,9 +2036,9 @@
 		-webkit-transform: translate3d(0, 0, 0);
 		position: relative;
 		border-top: solid 1px #c2c7cc;
-		padding: 6em 0 6em 0;
-		background-image: url("images/overlay.png"), url("images/footer.svg");
-		background-size: 1280px 1280px,				1000% 1000%;
+		padding: 8em 0 8em 0;
+		background-image: url("images/windows.png"), url("images/footer.svg");
+		background-size: 300px 300px,				100% 100%;
 	}
 
 /* Header */
