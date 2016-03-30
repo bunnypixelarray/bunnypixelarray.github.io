@@ -2038,7 +2038,7 @@
 		border-top: solid 1px #c2c7cc;
 		padding: 6em 0 6em 0;
 		background-image: url("images/overlay.png"), url("images/footer.svg");
-		background-size: 128px 128px,				100% 100%;
+		background-size: 1280px 1280px,				1000% 1000%;
 	}
 
 /* Header */
