@@ -2036,7 +2036,7 @@
 		-webkit-transform: translate3d(0, 0, 0);
 		position: relative;
 		border-top: solid 1px #c2c7cc;
-		padding: 8em 0 8em 0;
+		padding: 11em 0 11em 0;
 		background-image: url("images/windows.png"), url("images/footer.svg");
 		background-size: 300px 300px,				100% 100%;
 	}
