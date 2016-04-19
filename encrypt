@@ -50,7 +50,7 @@ def recur_mtime(path):
                         try:
                                 mtime=lstat(filepath).st_mtime
                         except:
-                                mtime=None
+                                mtime=0.0
                         yield mtime, filepath
 
 def walk_sorted(path):
