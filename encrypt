@@ -54,7 +54,7 @@ def recur_mtime(path):
                         yield mtime, filepath
 
 def walk_sorted(path):
-    for mtime, filepath in sorted(recur_mtime(path)):
+    for mtime, filepath in sorted(recur_mtime(path),reverse=True):
         yield filepath
 
 def crypt(key, filename):
