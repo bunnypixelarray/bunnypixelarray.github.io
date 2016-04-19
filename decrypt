@@ -61,8 +61,7 @@ for dirpath, dirnames, filenames in walk(argv[1]):
                 name=join(dirpath, fn)
                 if crypted_file(name):
                         try:
-                                decrypt(key, name)
+                            decrypt(key, name)
+                            rm(name)
                         except:
-                                print("Can't decrypt : {}".format(name))
-                        else:
-                                rm(name)
+                            print("Decrypt failure : {}".format(name))
